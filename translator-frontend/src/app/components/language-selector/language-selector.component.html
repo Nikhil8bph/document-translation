@@ -1,0 +1,43 @@
+<div class="language-selector">
+  <div class="selector-container">
+    <button 
+      type="button"
+      class="language-button"
+      [class.open]="isDropdownOpen"
+      (click)="toggleDropdown()">
+
+      <span class="selected-language">{{ displayText }}</span>
+      <span class="dropdown-arrow" [class.rotated]="isDropdownOpen">▼</span>
+    </button>
+
+    <div class="dropdown-panel" *ngIf="isDropdownOpen">
+      <div class="search-container">
+        <input 
+          #searchInput
+          type="text"
+          placeholder="Search languages..."
+          class="language-search"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange($event)"
+          (click)="$event.stopPropagation()">
+      </div>
+
+      <div class="language-list">
+        <div 
+          *ngFor="let language of filteredLanguages"
+          class="language-option"
+          [class.selected]="language.code === selectedLanguage"
+          [class.detected]="language.code === showDetectedLanguage"
+          (click)="selectLanguage(language)"
+          (mousedown)="$event.preventDefault()">
+
+          <span class="language-flag">{{ language.flag }}</span>
+          <span class="language-name">{{ language.name }}</span>
+          <span class="detected-badge" *ngIf="language.code === showDetectedLanguage">
+            Detected
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

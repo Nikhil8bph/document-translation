@@ -1,0 +1,169 @@
+.language-selector {
+  position: relative;
+  width: 100%;
+  
+  .selector-container {
+    position: relative;
+    
+    .language-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-12) var(--space-16);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-standard);
+      font-size: var(--font-size-base);
+      
+      &:hover {
+        border-color: var(--color-primary);
+        background: rgba(var(--color-teal-300-rgb), 0.05);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-focus-ring);
+      }
+      
+      &.open {
+        border-color: var(--color-primary);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      
+      .selected-language {
+        flex: 1;
+        text-align: left;
+        font-weight: var(--font-weight-medium);
+      }
+      
+      .dropdown-arrow {
+        transition: transform var(--duration-fast) var(--ease-standard);
+        color: var(--color-text-secondary);
+        
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+    }
+    
+    .dropdown-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-primary);
+      border-top: none;
+      border-radius: 0 0 var(--radius-base) var(--radius-base);
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      max-height: 300px;
+      overflow: hidden;
+      
+      .search-container {
+        padding: var(--space-12);
+        border-bottom: 1px solid var(--color-border);
+        
+        .language-search {
+          width: 100%;
+          padding: var(--space-8) var(--space-12);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-sm);
+          background: var(--color-background);
+          color: var(--color-text);
+          font-size: var(--font-size-sm);
+          
+          &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+          }
+          
+          &::placeholder {
+            color: var(--color-text-secondary);
+          }
+        }
+      }
+      
+      .language-list {
+        max-height: 200px;
+        overflow-y: auto;
+        
+        .language-option {
+          display: flex;
+          align-items: center;
+          gap: var(--space-12);
+          padding: var(--space-12) var(--space-16);
+          cursor: pointer;
+          transition: background-color var(--duration-fast) var(--ease-standard);
+          
+          &:hover {
+            background: var(--color-secondary-hover);
+          }
+          
+          &.selected {
+            background: rgba(var(--color-teal-300-rgb), 0.1);
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+          }
+          
+          &.detected {
+            background: rgba(var(--color-teal-300-rgb), 0.05);
+          }
+          
+          .language-flag {
+            font-size: var(--font-size-lg);
+            min-width: 24px;
+          }
+          
+          .language-name {
+            flex: 1;
+            color: var(--color-text);
+          }
+          
+          .detected-badge {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Scrollbar styling for language list */
+.language-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.language-list::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.language-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+.language-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .language-selector .selector-container .dropdown-panel {
+    max-height: 250px;
+    
+    .language-list {
+      max-height: 150px;
+    }
+  }
+}

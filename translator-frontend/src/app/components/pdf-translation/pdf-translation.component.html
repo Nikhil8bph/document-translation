@@ -1,0 +1,210 @@
+
+<div class="pdf-translation-container">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">PDF Translation Tool</h1>
+      <p class="app-subtitle">Powered by Granite AI Models</p>
+
+    </div>
+  </header>
+
+  <!-- Backend Warning Popup -->
+  <div class="popup-overlay" *ngIf="showBackendWarning" (click)="dismissBackendWarning()">
+    <div class="popup-content" (click)="$event.stopPropagation()">
+      <div class="popup-header">
+        <h3>Backend Not Available</h3>
+        <button class="close-btn" (click)="dismissBackendWarning()">&times;</button>
+      </div>
+      <div class="popup-body">
+        <p>The translation backend service is not running. The application will use demo mode for demonstration purposes.</p>
+        <p>To use the full functionality, please start the backend server at <code>http://localhost:8000</code></p>
+      </div>
+      <div class="popup-footer">
+        <button class="btn btn--primary" (click)="dismissBackendWarning()">Continue with Demo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Section -->
+  <section class="notification-section" *ngIf="showSuccessMessage">
+    <div class="success-message">
+      Translation completed successfully! You can now view and download your translated document.
+    </div>
+  </section>
+
+  <section class="notification-section" *ngIf="showDemoMessage && !fileId">
+    <div class="info-message">
+      Welcome to the document translator
+    </div>
+  </section>
+
+  <!-- Progress Indicator -->
+  <section class="progress-section" *ngIf="isTranslating || translationProgress?.progress">
+    <div class="progress-with-button">
+      <app-progress-indicator
+        [progress]="progressPercentage"
+        [message]="progressMessage"
+        [stage]="progressStage">
+      </app-progress-indicator>
+      <button 
+        *ngIf="savedFileId" 
+        class="start-new-btn"
+        (click)="startNew()">
+        Start New
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Upload and Translation Section -->
+  <section class="main-section" *ngIf="!hasStartedTranslation">
+    <div class="upload-language-card">
+      <!-- File Upload -->
+      <div class="upload-section" *ngIf="!fileId">
+        <app-file-upload 
+          (fileSelected)="onFileSelected($event)"
+          [isUploading]="isUploading">
+        </app-file-upload>
+      </div>
+
+      <!-- Language Controls -->
+      <div class="language-section" *ngIf="fileId">
+        <form [formGroup]="translationForm" class="language-form">
+          <div class="language-selectors">
+            <div class="language-group">
+              <label class="language-label">From Language</label>
+              <app-language-selector
+                [languages]="languages"
+                [selectedLanguage]="translationForm.get('sourceLanguage')?.value"
+                (languageSelected)="translationForm.patchValue({sourceLanguage: $event})"
+                [showDetectedLanguage]="detectedLanguage">
+              </app-language-selector>
+            </div>
+
+            <div class="arrow-separator">→</div>
+
+            <div class="language-group">
+              <label class="language-label">To Language</label>
+              <app-language-selector
+                [languages]="targetLanguages"
+                [selectedLanguage]="translationForm.get('targetLanguage')?.value"
+                (languageSelected)="translationForm.patchValue({targetLanguage: $event})">
+              </app-language-selector>
+            </div>
+          </div>
+
+          <button 
+            type="button"
+            class="translate-btn"
+            [disabled]="!canTranslate"
+            (click)="onTranslate()">
+            Start Translation
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- PDF Viewer Section -->
+  <section class="viewer-section" *ngIf="hasStartedTranslation">
+    <!-- Mobile View Toggle -->
+    <div class="mobile-toggle" *ngIf="isMobileView">
+      <button 
+        class="toggle-btn"
+        [class.active]="currentMobileView === 'original'"
+        (click)="switchMobileView('original')">
+        Original
+      </button>
+      <button 
+        class="toggle-btn"
+        [class.active]="currentMobileView === 'translated'"
+        [disabled]="!hasTranslatedContent"
+        (click)="switchMobileView('translated')">
+        Translated
+      </button>
+    </div>
+
+    <!-- PDF Viewers -->
+    <div class="pdf-viewers" [class.mobile-view]="isMobileView">
+      <!-- Original PDF Viewer -->
+      <div class="pdf-viewer original-viewer" 
+           *ngIf="!isMobileView || currentMobileView === 'original'">
+        <div class="viewer-title">
+          <span>Original Document</span>
+          <div class="viewer-controls">
+            <button 
+              class="control-btn"
+              [disabled]="zoomLevel <= 50"
+              (click)="onZoomChange(zoomLevel - 10)">
+              -
+            </button>
+            <span class="zoom-display">{{ zoomLevel }}%</span>
+            <button 
+              class="control-btn"
+              [disabled]="zoomLevel >= 200"
+              (click)="onZoomChange(zoomLevel + 10)">
+              +
+            </button>
+          </div>
+        </div>
+        <app-pdf-viewer
+          [pages]="originalPreviewPages"
+          [currentPage]="currentPage"
+          [zoomLevel]="zoomLevel"
+          viewerType="original">
+        </app-pdf-viewer>
+      </div>
+
+      <!-- Translated PDF Viewer -->
+      <div class="pdf-viewer translated-viewer" 
+           *ngIf="(!isMobileView || currentMobileView === 'translated') && hasTranslatedContent">
+        <div class="viewer-title">
+          <span>Translated Document</span>
+          <div class="viewer-controls">
+            <button 
+              class="control-btn"
+              [disabled]="zoomLevel <= 50"
+              (click)="onZoomChange(zoomLevel - 10)">
+              -
+            </button>
+            <span class="zoom-display">{{ zoomLevel }}%</span>
+            <button 
+              class="control-btn"
+              [disabled]="zoomLevel >= 200"
+              (click)="onZoomChange(zoomLevel + 10)">
+              +
+            </button>
+            <button 
+              class="download-btn"
+              (click)="onDownload()">
+              Download PDF
+            </button>
+          </div>
+        </div>
+        <app-pdf-viewer
+          [pages]="translatedPreviewPages"
+          [currentPage]="currentPage"
+          [zoomLevel]="zoomLevel"
+          viewerType="translated">
+        </app-pdf-viewer>
+      </div>
+
+      <!-- Translation Placeholder -->
+      <div class="translation-placeholder" 
+           *ngIf="!hasTranslatedContent && (!isMobileView || currentMobileView === 'translated')">
+        <div class="placeholder-content">
+          <div class="placeholder-icon">📄</div>
+          <h3>Translated PDF will appear here</h3>
+          <p>Select your target language and click "Translate PDF" to see the results</p>
+        </div>
+      </div>
+    </div>
+    
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="app-footer" *ngIf="!originalPreviewPages.length">
+    <p>© 2025 PDF Translation Tool. Powered by Granite AI Models.</p>
+  </footer>
+</div>

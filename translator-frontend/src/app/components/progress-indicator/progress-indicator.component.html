@@ -1,0 +1,35 @@
+
+<div class="progress-indicator">
+  <div class="progress-header">
+    <div class="stage-info">
+      <h3 class="stage-title">{{ stageTitle }}</h3>
+    </div>
+    <div class="progress-percentage">{{ progress }}%</div>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar-track">
+      <div 
+        class="progress-bar-fill"
+        [style.width.%]="progress">
+      </div>
+    </div>
+  </div>
+
+  <p class="progress-message" *ngIf="message">{{ message }}</p>
+
+  <div class="stage-steps">
+    <div class="step" [class.completed]="progress > 25" [class.active]="stage === 'upload'">
+      <span>Upload</span>
+    </div>
+    <div class="step" [class.completed]="progress > 50" [class.active]="stage === 'select-language'">
+      <span>Select Language</span>
+    </div>
+    <div class="step" [class.completed]="progress > 75" [class.active]="stage === 'translate'">
+      <span>Translate</span>
+    </div>
+    <div class="step" [class.completed]="progress >= 100" [class.active]="stage === 'complete'">
+      <span>Complete</span>
+    </div>
+  </div>
+</div>

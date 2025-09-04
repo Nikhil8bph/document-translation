@@ -1,0 +1,25 @@
+<div class="pdf-viewer-container">
+  <div 
+    #viewerContainer
+    class="viewer-container"
+    [style.transform]="'scale(' + (zoomLevel / 100) + ')'">
+
+    <div class="pdf-content" *ngIf="pages.length > 0">
+      <iframe 
+        [src]="getPdfJsUrl(pages[0])"
+        class="pdf-object"
+        frameborder="0">
+      </iframe>
+      <div class="pdf-fallback">
+        <a [href]="pages[0].pdf_url" target="_blank" class="btn btn--primary">Open PDF in New Tab</a>
+      </div>
+    </div>
+
+    <div *ngIf="pages.length === 0" class="no-content">
+      <div class="no-content-message">
+        <div class="loading-spinner"></div>
+        <p>Loading PDF...</p>
+      </div>
+    </div>
+  </div>
+</div>
