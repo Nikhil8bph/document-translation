@@ -1,0 +1,3 @@
+# Modelfile
+FROM granite3.2-vision:latest
+PARAMETER num_ctx 8192
